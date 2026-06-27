@@ -6,10 +6,14 @@ const port = 3000;
 
 
 
-//Routes
+//REST API
+
 app.get('/api/users', (req,res) => {
     return res.json(users);
 })
+
+//Routes
+
 app.get('/users', (req,res) => {
     const html = `
     <ul>
@@ -17,6 +21,12 @@ app.get('/users', (req,res) => {
     </ul>
     `;
     res.send(html);
+})
+
+app.get('/api/users/:id', (req,res) => {
+    const id = Number(req.params.id);
+    const user = users.find((user) => user.id ===id);
+    return res.json(user);
 })
 
 app.listen(port, () => console.log('Server Started on port ' + port));
