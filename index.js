@@ -1,9 +1,18 @@
 const express = require('express');
 const users = require("./MOCK_DATA.json");
+const fs = require('fs');
 
 const app = express();
 const port = 3000;
 
+//Middleware - Plugin
+app.use(express.urlencoded({extended: false}));
+
+//Custom Middleware
+app.use((req,res,next) => {
+    console.log('Hello from Middleware 1');
+    next();
+})
 
 
 //REST API
@@ -23,6 +32,7 @@ app.get('/users', (req,res) => {
     res.send(html);
 })
 
+
 app.route('/api/users/:id').get((req,res) => {
     const id = Number(req.params.id);
     const user = users.find((user) => user.id ===id);
@@ -30,6 +40,8 @@ app.route('/api/users/:id').get((req,res) => {
 })
 .patch((req,res) => {
     //Edit user with id
+    const body = req.body;
+    users.pop()
     return res.json({status: "Pending"});
 })
 .delete((req,res) => {
@@ -40,8 +52,13 @@ app.route('/api/users/:id').get((req,res) => {
 
 
 app.post('/api/users', (req,res) => {
-    //Todo: Create new User
-    return res.json({status: "Pending"});
-});    
+    //Create new user       
+    const body = req.body;
+    users.push({id: users.length + 1, ...body});
+    fs.writeFile('./MOCK_DATA.json', JSON.stringify(users), (err,data) => {
+            return res.json({status: "Success", message: "User Created"});
+        });
+});
 
 app.listen(port, () => console.log('Server Started on port ' + port));
+
